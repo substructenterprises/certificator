@@ -1,7 +1,7 @@
 package config
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/kelseyhightower/envconfig"
@@ -38,6 +38,7 @@ type Config struct {
 	DNSAddress      string   `envconfig:"DNS_ADDRESS" default:"127.0.0.1:53"`
 	Environment     string   `envconfig:"ENVIRONMENT" default:"prod"`
 	DomainsFile     string   `envconfig:"CERTIFICATOR_DOMAINS_FILE" default:"/code/domains.yml"`
+	DomainsList     []string `envconfig:"CERTIFICATOR_DOMAINS_LIST"`
 	RenewBeforeDays int      `envconfig:"CERTIFICATOR_RENEW_BEFORE_DAYS" default:"30"`
 	Domains         []string `yaml:"domains"`
 }
@@ -50,12 +51,18 @@ func LoadConfig() (Config, error) {
 		return Config{}, errors.Wrapf(err, "failed getting config from env")
 	}
 
+	if len(cfg.DomainsList) > 0 {
+		cfg.Domains = cfg.DomainsList
+
+		return cfg, err
+	}
+
 	f, err := os.Open(cfg.DomainsFile)
 	if err != nil {
 		return Config{}, errors.Wrapf(err, "opening %s", cfg.DomainsFile)
 	}
 
-	content, err := ioutil.ReadAll(f)
+	content, err := io.ReadAll(f)
 	if err != nil {
 		return Config{}, errors.Wrapf(err, "reading content of %s", cfg.DomainsFile)
 	}
