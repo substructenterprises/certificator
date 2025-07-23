@@ -1,7 +1,7 @@
 # ===========
 # Build stage
 # ===========
-FROM golang:1.16.3-alpine3.13 AS builder
+FROM golang:1.24.5-alpine3.22 AS builder
 
 WORKDIR /code
 
@@ -16,7 +16,7 @@ RUN go build -o certificator ./cmd/certificator
 # ===========
 # Final stage
 # ===========
-FROM alpine:3.13.0
+FROM alpine:3.22.0
 
 WORKDIR /app
 RUN apk --no-cache add curl

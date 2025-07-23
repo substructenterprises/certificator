@@ -1,4 +1,4 @@
-FROM golang:1.16.3-alpine3.13
+FROM golang:1.24.5-alpine3.22
 
 WORKDIR /code
 
@@ -6,6 +6,9 @@ ENV CGO_ENABLED 0
 
 # This is necessary to execute fixtures/update-dns.sh script
 RUN apk --no-cache add curl
+
+# This is necessary to allow for VCS stamping in the go mod download step
+RUN apk --no-cache add git
 
 # Pre-install dependencies to cache them as a separate image layer
 COPY go.mod go.sum ./
