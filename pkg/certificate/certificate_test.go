@@ -83,7 +83,7 @@ func TestNeedsReissuing(t *testing.T) {
 }
 
 func generateCert(t *testing.T, template *x509.Certificate) *x509.Certificate {
-	privatekey, err := rsa.GenerateKey(rand.Reader, 512)
+	privatekey, err := rsa.GenerateKey(rand.Reader, 1024)
 	testutil.Ok(t, err)
 
 	publickey := &privatekey.PublicKey
