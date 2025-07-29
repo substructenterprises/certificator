@@ -109,7 +109,7 @@ func TestConfig_WithDomainsList(t *testing.T) {
 		dnsChallengeProvider string = "other"
 		dnsPropagationReq    bool   = false
 		vaultRoleID          string = "role"
-		vaultSecretID        string = "secret"
+		vaultToken           string = "nomad-token"
 		vaultKVStorePath     string = "secret/path"
 		logFormat            string = "LOGFMT"
 		logLevel             string = "DEBUG"
@@ -126,9 +126,9 @@ func TestConfig_WithDomainsList(t *testing.T) {
 				ServerURL:                 acmeServerURL,
 			},
 			Vault: Vault{
-				ApproleRoleID:   vaultRoleID,
-				ApproleSecretID: vaultSecretID,
-				KVStoragePath:   vaultKVStorePath,
+				ApproleRoleID: vaultRoleID,
+				Token:         vaultToken,
+				KVStoragePath: vaultKVStorePath,
 			},
 			Log: Log{
 				Format: logFormat,
@@ -150,7 +150,7 @@ func TestConfig_WithDomainsList(t *testing.T) {
 	os.Setenv("ACME_DNS_CHALLENGE_PROVIDER", dnsChallengeProvider)
 	os.Setenv("ACME_DNS_PROPAGATION_REQUIREMENT", strconv.FormatBool(dnsPropagationReq))
 	os.Setenv("VAULT_APPROLE_ROLE_ID", vaultRoleID)
-	os.Setenv("VAULT_APPROLE_SECRET_ID", vaultSecretID)
+	os.Setenv("VAULT_TOKEN", vaultToken)
 	os.Setenv("VAULT_KV_STORAGE_PATH", vaultKVStorePath)
 	os.Setenv("LOG_FORMAT", logFormat)
 	os.Setenv("LOG_LEVEL", logLevel)
