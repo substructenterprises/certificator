@@ -57,8 +57,13 @@ func TestAcmeClientAndAccountSetup(t *testing.T) {
 	deleteAccountFromVault(t, testVaultClient)
 	deleteKeyFromVault(t, testVaultClient)
 
+	acmeConfig := config.Acme{
+		AccountEmail:      acmeEmail,
+		ServerURL:         acmeURL,
+		ReregisterAccount: true,
+	}
 	// This populates data in Vault, account and key are both present
-	_, err = acme.NewClient(acmeEmail, acmeURL, true, vaultClient, logger)
+	_, err = acme.NewClient(acmeConfig, vaultClient, logger)
 	testutil.Ok(t, err)
 
 	// Save account and key data from first registration
@@ -134,7 +139,12 @@ func TestAcmeClientAndAccountSetup(t *testing.T) {
 				testutil.Ok(t, err)
 			}
 
-			_, err := acme.NewClient(acmeEmail, acmeURL, tcase.reregisteringEnabled, vaultClient, logger)
+			acmeConfig := config.Acme{
+				AccountEmail:      acmeEmail,
+				ServerURL:         acmeURL,
+				ReregisterAccount: tcase.reregisteringEnabled,
+			}
+			_, err := acme.NewClient(acmeConfig, vaultClient, logger)
 			if tcase.expectedErr {
 				testutil.NotOk(t, err)
 			} else {
@@ -152,7 +162,12 @@ func TestCertificateObtaining(t *testing.T) {
 	vaultClient, err := vault.NewVaultClient(vaultCfg, "dev", logger)
 	testutil.Ok(t, err)
 
-	acmeClient, err := acme.NewClient(acmeEmail, acmeURL, true, vaultClient, logger)
+	acmeConfig := config.Acme{
+		AccountEmail:      acmeEmail,
+		ServerURL:         acmeURL,
+		ReregisterAccount: true,
+	}
+	acmeClient, err := acme.NewClient(acmeConfig, vaultClient, logger)
 	testutil.Ok(t, err)
 
 	for _, domain := range []string{"example.com", "test.com", "mydomain.com"} {
