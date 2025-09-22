@@ -1,11 +1,11 @@
 package config
 
 import (
+	"fmt"
 	"io"
 	"os"
 
 	"github.com/kelseyhightower/envconfig"
-	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
 
@@ -49,30 +49,30 @@ type Config struct {
 // LoadConfig loads configuration options to  variable
 func LoadConfig() (Config, error) {
 	var cfg Config
-	err := envconfig.Process("", &cfg)
-	if err != nil {
-		return Config{}, errors.Wrapf(err, "failed getting config from env")
+	if err := envconfig.Process("", &cfg); err != nil {
+		return Config{}, fmt.Errorf("failed getting config from env: %w", err)
 	}
 
 	if len(cfg.DomainsList) > 0 {
 		cfg.Domains = cfg.DomainsList
 
-		return cfg, err
+		return cfg, nil
 	}
 
 	f, err := os.Open(cfg.DomainsFile)
 	if err != nil {
-		return Config{}, errors.Wrapf(err, "opening %s", cfg.DomainsFile)
+		return Config{}, fmt.Errorf("opening %s: %w", cfg.DomainsFile, err)
 	}
+	defer f.Close()
 
 	content, err := io.ReadAll(f)
 	if err != nil {
-		return Config{}, errors.Wrapf(err, "reading content of %s", cfg.DomainsFile)
+		return Config{}, fmt.Errorf("reading content of %s: %w", cfg.DomainsFile, err)
 	}
 
 	if err := yaml.Unmarshal(content, &cfg); err != nil {
-		return Config{}, errors.Wrapf(err, "parsing %s", cfg.DomainsFile)
+		return Config{}, fmt.Errorf("parsing %s: %w", cfg.DomainsFile, err)
 	}
 
-	return cfg, err
+	return cfg, nil
 }
