@@ -1,13 +1,13 @@
 services:
   pebble:
     image: ghcr.io/letsencrypt/pebble:latest
-    command: pebble -config /test/config/pebble-config.json -strict -dnsserver challtestsrv:8053
+    command: -config /test/config/pebble-config.json -strict -dnsserver challtestsrv:8053
     # ports:
     #   - "14000:14000"  # HTTPS ACME API
     #   - "15000:15000"  # HTTPS Management API
   pebble-eab:
     image: ghcr.io/letsencrypt/pebble:latest
-    command: pebble -config /test/config/pebble-config-external-account-bindings.json -strict -dnsserver challtestsrv:8053
+    command: -config /test/config/pebble-config-external-account-bindings.json -strict -dnsserver challtestsrv:8053
     volumes:
       - ./fixtures/pebble-eab/cert.pem:/test/certs/localhost/cert.pem:Z
       - ./fixtures/pebble-eab/key.pem:/test/certs/localhost/key.pem:Z
@@ -16,11 +16,11 @@ services:
     depends_on:
       - pebble
       - pebble-eab
-    command: pebble-challtestsrv -http01 "" -tlsalpn01 "" -dns01 ":8053"
+    command: -http01 "" -tlsalpn01 "" -dns01 ":8053"
     ports:
-      - "8055:8055"      # HTTP Management API
-      - "8053:8053/tcp"  # DNS API
-      - "8053:8053/udp"  # DNS API
+      - "8055:8055" # HTTP Management API
+      - "8053:8053/tcp" # DNS API
+      - "8053:8053/udp" # DNS API
   vault:
     image: vault:1.6.2
     # ports:
@@ -36,6 +36,7 @@ services:
       - vault
     env_file:
       - .env.dev
+
   tester:
     build:
       context: .
@@ -45,4 +46,4 @@ services:
       - pebble-eab
       - challtestsrv
       - vault
-    command: ["true"] # do not start the container when `docker-compose up` is executed
+    command: [ "true" ] # do not start the container when `docker-compose up` is executed
