@@ -39,7 +39,7 @@ jobs:
         run: docker compose build tester
       
       - name: Docker Compose up
-        run: docker compose up 
+        run: docker compose up -d
 
       - name: Docker ps
         run: docker ps
