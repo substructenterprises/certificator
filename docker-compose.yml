@@ -18,9 +18,9 @@ services:
       - pebble-eab
     command: -http01 "" -tlsalpn01 "" -dns01 ":8053"
     ports:
-      - "8055:8055" # HTTP Management API
-      - "8053:8053/tcp" # DNS API
-      - "8053:8053/udp" # DNS API
+      - "8055:8055"      # HTTP Management API
+      - "8053:8053/tcp"  # DNS API
+      - "8053:8053/udp"  # DNS API
   vault:
     image: vault:1.6.2
     # ports:
@@ -46,4 +46,4 @@ services:
       - pebble-eab
       - challtestsrv
       - vault
-    command: [ "true" ] # do not start the container when `docker-compose up` is executed
+    command: ["true"] # do not start the container when `docker-compose up` is executed

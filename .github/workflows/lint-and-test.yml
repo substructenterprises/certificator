@@ -41,8 +41,5 @@ jobs:
       - name: Docker Compose up
         run: docker compose up -d
 
-      - name: Docker ps
-        run: docker ps
-
       - name: Run tester container
         run: docker compose run --rm tester go test ./...
