@@ -1,4 +1,3 @@
-version: '3'
 services:
   pebble:
     image: ghcr.io/letsencrypt/pebble:latest
@@ -6,12 +5,16 @@ services:
     # ports:
     #   - "14000:14000"  # HTTPS ACME API
     #   - "15000:15000"  # HTTPS Management API
+    networks:
+      - test
   pebble-eab:
     image: ghcr.io/letsencrypt/pebble:latest
     command: pebble -config /test/config/pebble-config-external-account-bindings.json -strict -dnsserver challtestsrv:8053
     volumes:
       - ./fixtures/pebble-eab/cert.pem:/test/certs/localhost/cert.pem:Z
       - ./fixtures/pebble-eab/key.pem:/test/certs/localhost/key.pem:Z
+    networks:
+      - test
   challtestsrv:
     image: ghcr.io/letsencrypt/pebble-challtestsrv:latest
     depends_on:
@@ -22,12 +25,16 @@ services:
       - "8055:8055"      # HTTP Management API
       - "8053:8053/tcp"  # DNS API
       - "8053:8053/udp"  # DNS API
+    networks:
+      - test
   vault:
     image: vault:1.6.2
     # ports:
     #   - 8200:8200
     environment:
       - VAULT_DEV_ROOT_TOKEN_ID=supersecret
+    networks:
+      - test
   app:
     build: .
     depends_on:
@@ -37,7 +44,8 @@ services:
       - vault
     env_file:
       - .env.dev
-
+    networks:
+      - test
   tester:
     build:
       context: .
@@ -48,3 +56,8 @@ services:
       - challtestsrv
       - vault
     command: ["true"] # do not start the container when `docker-compose up` is executed
+    networks:
+      - test
+networks:
+  test:
+    driver: bridge
