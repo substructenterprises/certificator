@@ -53,7 +53,8 @@ func TestAcmeClientAndAccountSetup(t *testing.T) {
 	// Make sure that this variable provides access to vault KV storage
 	testVaultClient.SetToken(vaultDevToken)
 
-	vaultClient, err := vault.NewVaultClient("", "", "dev", vaultKVPath, logger)
+	vaultCfg := config.Vault{KVStoragePath: vaultKVPath}
+	vaultClient, err := vault.NewVaultClient(vaultCfg, "dev", logger)
 	testutil.Ok(t, err)
 
 	// Make sure we are starting in a clean Vault
@@ -162,7 +163,8 @@ func TestCertificateObtaining(t *testing.T) {
 	logger := logrus.New()
 	logger.SetLevel(logrus.WarnLevel)
 
-	vaultClient, err := vault.NewVaultClient("", "", "dev", vaultKVPath, logger)
+	vaultCfg := config.Vault{KVStoragePath: vaultKVPath}
+	vaultClient, err := vault.NewVaultClient(vaultCfg, "dev", logger)
 	testutil.Ok(t, err)
 
 	acmeConfig := config.Acme{
@@ -190,7 +192,8 @@ func TestCertificateObtainingWithEAB(t *testing.T) {
 	logger := logrus.New()
 	logger.SetLevel(logrus.WarnLevel)
 
-	vaultClient, err := vault.NewVaultClient("", "", "dev", vaultEABKVPath, logger)
+	vaultCfg := config.Vault{KVStoragePath: vaultEABKVPath}
+	vaultClient, err := vault.NewVaultClient(vaultCfg, "dev", logger)
 	testutil.Ok(t, err)
 
 	acmeConfig := config.Acme{

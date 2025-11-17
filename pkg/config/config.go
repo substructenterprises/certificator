@@ -24,6 +24,7 @@ type Acme struct {
 type Vault struct {
 	ApproleRoleID   string `envconfig:"VAULT_APPROLE_ROLE_ID"`
 	ApproleSecretID string `envconfig:"VAULT_APPROLE_SECRET_ID"`
+	Token           string `envconfig:"VAULT_TOKEN"`
 	KVStoragePath   string `envconfig:"VAULT_KV_STORAGE_PATH" default:"secret/data/certificator/"`
 }
 
