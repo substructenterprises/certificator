@@ -1,12 +1,12 @@
 package config
 
 import (
+	"fmt"
 	"io"
 	"os"
 
 	"github.com/kelseyhightower/envconfig"
-	"github.com/pkg/errors"
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v4"
 )
 
 // Acme contains acme related configuration parameters
@@ -51,7 +51,7 @@ func LoadConfig() (Config, error) {
 	var cfg Config
 	err := envconfig.Process("", &cfg)
 	if err != nil {
-		return Config{}, errors.Wrapf(err, "failed getting config from env")
+		return Config{}, fmt.Errorf("failed getting config from env: %w", err)
 	}
 
 	if len(cfg.DomainsList) > 0 {
@@ -71,18 +71,18 @@ func LoadConfig() (Config, error) {
 func parseDomainsFile(domainsFile string) ([]string, error) {
 	f, err := os.Open(domainsFile)
 	if err != nil {
-		return nil, errors.Wrapf(err, "opening %s", domainsFile)
+		return nil, fmt.Errorf("opening %s: %w", domainsFile, err)
 	}
 
 	content, err := io.ReadAll(f)
 	if err != nil {
-		return nil, errors.Wrapf(err, "reading content of %s", domainsFile)
+		return nil, fmt.Errorf("reading content of %s: %w", domainsFile, err)
 	}
 
 	var contentMap map[string]interface{}
 
 	if err := yaml.Unmarshal(content, &contentMap); err != nil {
-		return nil, errors.Wrapf(err, "parsing %s", domainsFile)
+		return nil, fmt.Errorf("parsing %s: %w", domainsFile, err)
 	}
 
 	var domains []string
