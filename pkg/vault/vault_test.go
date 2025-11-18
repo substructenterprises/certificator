@@ -23,11 +23,11 @@ type loginApprole struct {
 
 func TestNewVaultClient(t *testing.T) {
 	var (
-		secretID   string = "secretIDexample"
-		roleID     string = "roleIDexample"
-		prodToken  string = "secretProdTokensss"
-		devToken   string = "secretDevToken"
-		vaultToken string = "vault-token"
+		secretID   = "secretIDexample"
+		roleID     = "roleIDexample"
+		prodToken  = "secretProdTokensss"
+		devToken   = "secretDevToken"
+		vaultToken = "vault-token"
 	)
 
 	logger := logrus.New()
@@ -37,11 +37,11 @@ func TestNewVaultClient(t *testing.T) {
 	})
 	smux := mux.NewRouter()
 	smux.HandleFunc("/v1/auth/approle/login", func(w http.ResponseWriter, r *http.Request) {
-		defer r.Body.Close()
+		defer func() { _ = r.Body.Close() }()
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			w.WriteHeader(500)
-			_, _ = w.Write([]byte(fmt.Sprintf("error occurred: %s", err.Error())))
+			_, _ = fmt.Fprintf(w, "error occurred: %s", err.Error())
 			return
 		}
 
@@ -49,14 +49,14 @@ func TestNewVaultClient(t *testing.T) {
 		err = json.Unmarshal(body, &credentials)
 		if err != nil {
 			w.WriteHeader(500)
-			_, _ = w.Write([]byte(fmt.Sprintf("error occurred: %s", err.Error())))
+			_, _ = fmt.Fprintf(w, "error occurred: %s", err.Error())
 			return
 		}
 
 		content, err := json.Marshal(map[string]interface{}{"auth": map[string]string{"client_token": prodToken}})
 		if err != nil {
 			w.WriteHeader(500)
-			_, _ = w.Write([]byte(fmt.Sprintf("error occurred: %s", err.Error())))
+			_, _ = fmt.Fprintf(w, "error occurred: %s", err.Error())
 			return
 		}
 
@@ -77,9 +77,9 @@ func TestNewVaultClient(t *testing.T) {
 	srv.Addr = ":0"
 	go func() { _ = srv.Serve(listener) }()
 
-	os.Setenv("VAULT_ADDR", "http://"+listener.Addr().String())
-	os.Setenv("VAULT_DEV_ROOT_TOKEN_ID", devToken)
-	os.Setenv("VAULT_TOKEN", vaultToken)
+	_ = os.Setenv("VAULT_ADDR", "http://"+listener.Addr().String())
+	_ = os.Setenv("VAULT_DEV_ROOT_TOKEN_ID", devToken)
+	_ = os.Setenv("VAULT_TOKEN", vaultToken)
 
 	for _, tcase := range []struct {
 		tcaseName     string

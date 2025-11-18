@@ -32,12 +32,12 @@ var (
 
 func TestMain(m *testing.M) {
 	//Set necessary ENV variables
-	os.Setenv("VAULT_ADDR", "http://vault:8200")
-	os.Setenv("VAULT_DEV_ROOT_TOKEN_ID", vaultDevToken)
+	_ = os.Setenv("VAULT_ADDR", "http://vault:8200")
+	_ = os.Setenv("VAULT_DEV_ROOT_TOKEN_ID", vaultDevToken)
 	// This makes pebble certificate trusted
-	os.Setenv("LEGO_CA_CERTIFICATES", "../fixtures/pebble.minica.pem")
+	_ = os.Setenv("LEGO_CA_CERTIFICATES", "../fixtures/pebble.minica.pem")
 	// This shows where is the exec challenge provider script
-	os.Setenv("EXEC_PATH", "../fixtures/update-dns.sh")
+	_ = os.Setenv("EXEC_PATH", "../fixtures/update-dns.sh")
 
 	os.Exit(m.Run())
 }
