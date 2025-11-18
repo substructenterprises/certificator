@@ -7,10 +7,9 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/hashicorp/vault/api v1.22.0
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/thanos-io/thanos v0.24.0
-	gopkg.in/yaml.v2 v2.4.0
+	go.yaml.in/yaml/v4 v4.0.0-rc.3
 )
 
 require (
@@ -157,6 +156,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/peterhellberg/link v1.2.0 // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/pquerna/otp v1.5.0 // indirect
 	github.com/prometheus/client_golang v1.23.2 // indirect
@@ -226,6 +226,7 @@ require (
 	google.golang.org/protobuf v1.36.10 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/ns1/ns1-go.v2 v2.15.1 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
