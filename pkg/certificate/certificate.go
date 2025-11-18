@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/go-acme/lego/certcrypto"
+	"github.com/go-acme/lego/v4/certcrypto"
 	"github.com/go-acme/lego/v4/certificate"
 	"github.com/go-acme/lego/v4/challenge/dns01"
 	"github.com/go-acme/lego/v4/lego"
@@ -28,7 +28,7 @@ func ObtainCertificate(client *lego.Client, vault *vault.VaultClient, domains []
 	} else {
 		err = client.Challenge.SetDNS01Provider(provider,
 			dns01.AddRecursiveNameservers([]string{dnsAddr}),
-			dns01.DisableCompletePropagationRequirement())
+			dns01.DisableAuthoritativeNssPropagationRequirement())
 	}
 	if err != nil {
 		return err

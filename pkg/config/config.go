@@ -1,7 +1,7 @@
 package config
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/kelseyhightower/envconfig"
@@ -74,7 +74,7 @@ func parseDomainsFile(domainsFile string) ([]string, error) {
 		return nil, errors.Wrapf(err, "opening %s", domainsFile)
 	}
 
-	content, err := ioutil.ReadAll(f)
+	content, err := io.ReadAll(f)
 	if err != nil {
 		return nil, errors.Wrapf(err, "reading content of %s", domainsFile)
 	}
