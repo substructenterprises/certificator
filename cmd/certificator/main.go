@@ -55,7 +55,7 @@ func main() {
 	for _, dom := range cfg.Domains {
 		allDomains := strings.Split(dom, ",")
 		mainDomain := allDomains[0]
-		cert, err := certificate.GetCertificate(mainDomain, vaultClient)
+		cert, _, err := certificate.GetCertificateAndKey(mainDomain, vaultClient)
 		if err != nil {
 			failedDomains = append(failedDomains, mainDomain)
 			logger.Error(err)
@@ -63,7 +63,7 @@ func main() {
 		}
 		logger.Infof("checking certificate for %s", mainDomain)
 
-		needsReissuing, err := certificate.NeedsReissuing(cert, allDomains, cfg.RenewBeforeDays, logger)
+		needsReissuing, err := certificate.NeedsReissuing(cert[0], allDomains, cfg.RenewBeforeDays, logger)
 		if err != nil {
 			failedDomains = append(failedDomains, mainDomain)
 			logger.Error(err)

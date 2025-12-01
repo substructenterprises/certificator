@@ -43,3 +43,38 @@ jobs:
 
       - name: Run tester container
         run: docker compose run --rm tester go test ./...
+
+      - name: Build Certificatee
+        run: go build
+        working-directory: cmd/certificatee
+
+      - name: Set up Certificatee test cert files
+        run: |
+          mkdir -p fixtures/certificatee-test-certs
+          touch fixtures/certificatee-test-certs/mydomain.com.pem
+
+      - name: Run Certificatee to deploy new certificate
+        run: |
+          output=$(./cmd/certificatee/certificatee 2>&1)
+          echo "$output"
+          echo "$output" | grep "deploying certificate"
+        env:
+          ENVIRONMENT: dev
+          VAULT_KV_STORAGE_PATH: /secret/data/integration_test/
+          VAULT_ADDR: http://127.0.0.1:8200
+          VAULT_DEV_ROOT_TOKEN_ID: supersecret
+          CERTIFICATEE_CERTIFICATE_PATH: fixtures/certificatee-test-certs/
+          CERTIFICATEE_CERTIFICATE_EXTENSION: ".pem"
+
+      - name: Run Certificatee (certificate should not be replaced)
+        run: |
+          output=$(./cmd/certificatee/certificatee 2>&1)
+          echo "$output"
+          echo "$output" | grep "not replacing"
+        env:
+          ENVIRONMENT: dev
+          VAULT_KV_STORAGE_PATH: /secret/data/integration_test/
+          VAULT_ADDR: http://127.0.0.1:8200
+          VAULT_DEV_ROOT_TOKEN_ID: supersecret
+          CERTIFICATEE_CERTIFICATE_PATH: fixtures/certificatee-test-certs/
+          CERTIFICATEE_CERTIFICATE_EXTENSION: ".pem"

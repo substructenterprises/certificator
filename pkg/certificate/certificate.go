@@ -1,6 +1,7 @@
 package certificate
 
 import (
+	"crypto"
 	"crypto/x509"
 	"fmt"
 	"time"
@@ -46,21 +47,27 @@ func ObtainCertificate(client *lego.Client, vault *vault.VaultClient, domains []
 	return storeCertificateInVault(domains[0], certificate, vault)
 }
 
-// GetCertificate reads certificate from Vault KV store and parses it
-func GetCertificate(domain string, vault *vault.VaultClient) (*x509.Certificate, error) {
+// GetCertificate reads certificate and key from Vault KV store and parses it
+func GetCertificateAndKey(domain string, vault *vault.VaultClient) ([]*x509.Certificate, crypto.PrivateKey, error) {
 	secrets, err := vault.KVRead(vaultCertLocation(domain))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if cert, ok := secrets["certificate"].(string); ok {
-		parsedCert, err := certcrypto.ParsePEMBundle([]byte(cert))
-		if err != nil {
-			return nil, err
+		if key, ok := secrets["private_key"].(string); ok {
+			parsedCert, err := certcrypto.ParsePEMBundle([]byte(cert))
+			if err != nil {
+				return nil, nil, err
+			}
+			parsedKey, err := certcrypto.ParsePEMPrivateKey([]byte(key))
+			if err != nil {
+				return nil, nil, err
+			}
+			return parsedCert, parsedKey, nil
 		}
-		return parsedCert[0], nil
 	}
 
-	return nil, nil
+	return nil, nil, nil
 }
 
 // NeedsReissuing checks if certificate domains and required domains match
@@ -91,6 +98,29 @@ func NeedsReissuing(certificate *x509.Certificate, domains []string, days int, l
 	}
 
 	return true, nil
+}
+
+func ComposeCertificate(certs []*x509.Certificate, key crypto.PrivateKey, combined bool) []byte {
+
+	var certificate []byte
+
+	for _, cert := range certs {
+		var DERCert certcrypto.DERCertificateBytes = cert.Raw
+		certificate = append(certificate, certcrypto.PEMEncode(DERCert)...)
+	}
+
+	if combined {
+		certificate = append(certificate, ComposeKey(key)...)
+	}
+
+	return certificate
+}
+
+func ComposeKey(key crypto.PrivateKey) []byte {
+
+	certificate := certcrypto.PEMEncode(key)
+
+	return certificate
 }
 
 func arraysEqual(array1 []string, array2 []string) bool {

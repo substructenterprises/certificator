@@ -28,6 +28,11 @@ func TestDefaultConfig(t *testing.T) {
 			Format: "JSON",
 			Level:  "INFO",
 		},
+		Certificatee: Certificatee{
+			CertificateExtension: ".pem",
+			KeyExtension:         ".pem",
+			CombineCertAndKey:    true,
+		},
 		DNSAddress:      "127.0.0.1:53",
 		Environment:     "prod",
 		DomainsFile:     "../../domains.yml",
@@ -72,6 +77,11 @@ func TestConfig_WithDomainsFile(t *testing.T) {
 			Log: Log{
 				Format: logFormat,
 				Level:  logLevel,
+			},
+			Certificatee: Certificatee{
+				CertificateExtension: ".pem",
+				KeyExtension:         ".pem",
+				CombineCertAndKey:    true,
 			},
 			DNSAddress:      dnsAddress,
 			Environment:     environment,
@@ -133,6 +143,11 @@ func TestConfig_WithDomainsList(t *testing.T) {
 			Log: Log{
 				Format: logFormat,
 				Level:  logLevel,
+			},
+			Certificatee: Certificatee{
+				CertificateExtension: ".pem",
+				KeyExtension:         ".pem",
+				CombineCertAndKey:    true,
 			},
 			DNSAddress:      dnsAddress,
 			Environment:     environment,
