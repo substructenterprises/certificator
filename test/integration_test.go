@@ -180,11 +180,10 @@ func TestCertificateObtaining(t *testing.T) {
 			"challtestsrv:8053", "exec", false)
 		testutil.Ok(t, err)
 
-		cert, err := certificate.GetCertificate(domain, vaultClient)
-		testutil.Ok(t, err)
+		cert, _, _ := certificate.GetCertificateAndKey(domain, vaultClient)
 
 		// Check if certificate is issued recently
-		testutil.Assert(t, time.Since(cert.NotBefore).Minutes() < 5)
+		testutil.Assert(t, time.Since(cert[0].NotBefore).Minutes() < 5)
 	}
 }
 
@@ -211,11 +210,11 @@ func TestCertificateObtainingWithEAB(t *testing.T) {
 			"challtestsrv:8053", "exec", false)
 		testutil.Ok(t, err)
 
-		cert, err := certificate.GetCertificate(domain, vaultClient)
+		cert, _, err := certificate.GetCertificateAndKey(domain, vaultClient)
 		testutil.Ok(t, err)
 
 		// Check if certificate is issued recently
-		testutil.Assert(t, time.Since(cert.NotBefore).Minutes() < 5)
+		testutil.Assert(t, time.Since(cert[0].NotBefore).Minutes() < 5)
 	}
 }
 

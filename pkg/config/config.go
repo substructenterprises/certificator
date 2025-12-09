@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/kelseyhightower/envconfig"
 	"go.yaml.in/yaml/v4"
@@ -46,6 +48,19 @@ type Config struct {
 	Domains         []string
 }
 
+// Configuration values specific to the certificatee tool
+type Certificatee struct {
+	Vault                Vault
+	Log                  Log
+	Environment          string   `envconfig:"ENVIRONMENT" default:"prod"`
+	CertificatePath      string   `envconfig:"CERTIFICATEE_CERTIFICATE_PATH" required:"true"`
+	CertificateExtension string   `envconfig:"CERTIFICATEE_CERTIFICATE_EXTENSION" default:".pem"`
+	KeyPath              string   `envconfig:"CERTIFICATEE_KEY_PATH"`
+	KeyExtension         string   `envconfig:"CERTIFICATEE_KEY_EXTENSION" default:".pem"`
+	CombineCertAndKey    bool     `envconfig:"CERTIFICATEE_COMBINE_CERT_AND_KEY" default:"true"`
+	CertificateNames     []string `envconfig:"CERTIFICATEE_DOMAINS_LIST"`
+}
+
 // LoadConfig loads configuration options to  variable
 func LoadConfig() (Config, error) {
 	var cfg Config
@@ -66,6 +81,22 @@ func LoadConfig() (Config, error) {
 
 		return cfg, err
 	}
+}
+
+func LoadCertificateeConfig() (Certificatee, error) {
+	var cfg Certificatee
+	err := envconfig.Process("", &cfg)
+	if err != nil {
+		return Certificatee{}, fmt.Errorf("failed getting Certificatee config from env: %w", err)
+	}
+
+	if len(cfg.CertificateNames) == 0 {
+		cfg.CertificateNames, err = getCertificateNamesFromFiles(cfg.CertificatePath, cfg.CertificateExtension)
+		if err != nil {
+			return cfg, err
+		}
+	}
+	return cfg, err
 }
 
 func parseDomainsFile(domainsFile string) ([]string, error) {
@@ -92,4 +123,23 @@ func parseDomainsFile(domainsFile string) ([]string, error) {
 	}
 
 	return domains, nil
+}
+
+func getCertificateNamesFromFiles(path string, certificateExtension string) ([]string, error) {
+	var certificateNames []string
+
+	certDirFiles, err := os.ReadDir(path)
+	if err != nil {
+		return certificateNames, err
+	}
+
+	for _, certDirFile := range certDirFiles {
+		fileExtension := filepath.Ext(certDirFile.Name())
+		if certificateExtension == fileExtension {
+			certificateName := strings.TrimSuffix(certDirFile.Name(), certificateExtension)
+			certificateNames = append(certificateNames, certificateName)
+		}
+	}
+
+	return certificateNames, nil
 }

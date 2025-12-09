@@ -164,6 +164,63 @@ func TestConfig_WithDomainsList(t *testing.T) {
 	testutil.Equals(t, expectedConf, conf)
 }
 
+func TestLoadCertificateeConfig_Default(t *testing.T) {
+	resetEnvVars()
+
+	var expectedConf = Certificatee{
+		Vault: Vault{
+			ApproleRoleID:   "",
+			ApproleSecretID: "",
+			KVStoragePath:   "secret/data/certificator/",
+		},
+		Log: Log{
+			Format: "JSON",
+			Level:  "INFO",
+		},
+		Environment:          "prod",
+		CertificatePath:      "../../fixtures/certificatee-test-certs",
+		CertificateExtension: ".pem",
+		CertificateNames:     []string{"mydomain.com"},
+		KeyExtension:         ".pem",
+		CombineCertAndKey:    true,
+	}
+
+	_ = os.Setenv("CERTIFICATEE_CERTIFICATE_PATH", "../../fixtures/certificatee-test-certs")
+
+	conf, err := LoadCertificateeConfig()
+	testutil.Ok(t, err)
+	testutil.Equals(t, expectedConf, conf)
+}
+
+func TestLoadCertificateeConfig_WithCertificateNames(t *testing.T) {
+	resetEnvVars()
+
+	var expectedConf = Certificatee{
+		Vault: Vault{
+			ApproleRoleID:   "",
+			ApproleSecretID: "",
+			KVStoragePath:   "secret/data/certificator/",
+		},
+		Log: Log{
+			Format: "JSON",
+			Level:  "INFO",
+		},
+		Environment:          "prod",
+		CertificatePath:      "../../fixtures/certificatee-test-certs",
+		CertificateExtension: ".pem",
+		CertificateNames:     []string{"anotherdomain.com"},
+		KeyExtension:         ".pem",
+		CombineCertAndKey:    true,
+	}
+
+	_ = os.Setenv("CERTIFICATEE_CERTIFICATE_PATH", "../../fixtures/certificatee-test-certs")
+	_ = os.Setenv("CERTIFICATEE_DOMAINS_LIST", "anotherdomain.com")
+
+	conf, err := LoadCertificateeConfig()
+	testutil.Ok(t, err)
+	testutil.Equals(t, expectedConf, conf)
+}
+
 func resetEnvVars() {
 	// Set required env vars
 	_ = os.Setenv("ACME_ACCOUNT_EMAIL", "test@test.com")
