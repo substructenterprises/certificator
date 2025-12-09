@@ -50,10 +50,9 @@ type Config struct {
 
 // Configuration values specific to the certificatee tool
 type Certificatee struct {
-	Vault       Vault
-	Log         Log
-	Environment string `envconfig:"ENVIRONMENT" default:"prod"`
-
+	Vault                Vault
+	Log                  Log
+	Environment          string   `envconfig:"ENVIRONMENT" default:"prod"`
 	CertificatePath      string   `envconfig:"CERTIFICATEE_CERTIFICATE_PATH" required:"true"`
 	CertificateExtension string   `envconfig:"CERTIFICATEE_CERTIFICATE_EXTENSION" default:".pem"`
 	KeyPath              string   `envconfig:"CERTIFICATEE_KEY_PATH"`

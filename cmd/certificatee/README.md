@@ -11,7 +11,7 @@ A tool that compares file-based PEM certificates with certificates deployed to V
 ## Configuration
 
 Certificatee reads most configuration parameters from environment variables, and shares many of the same environment variables with Certificator.
-They are defined in [pkg/config/config.go](pkg/config/config.go) Config struct
+They are defined in [pkg/config/config.go](pkg/config/config.go) Certificatee struct
 
 Configuration variables:
 - `VAULT_APPROLE_ROLE_ID` - role ID for Vault approle authentication method. **Required in prod env if VAULT_TOKEN is not set**

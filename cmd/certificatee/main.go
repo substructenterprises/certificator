@@ -50,26 +50,21 @@ func main() {
 	logger.Info(cfg.CertificateNames)
 
 	for _, cert := range cfg.CertificateNames {
-
 		certificatePath := cfg.CertificatePath + cert + cfg.CertificateExtension
 
 		fileCert, err := loadFile(certificatePath)
 		if err != nil {
 			failedCertificates = append(failedCertificates, cert)
-			logger.Error(err)
+			logger.Errorf("error loading certificate from path %s: %v", certificatePath, err)
 			continue
 		}
 
 		parsedVaultCert, parsedVaultKey, err := certificate.GetCertificateAndKey(cert, vaultClient)
 		if err != nil {
 			failedCertificates = append(failedCertificates, cert)
-			logger.Error(err)
+			logger.Errorf("error getting certificate and key %s: %v", cert, err)
 			continue
 		}
-
-		logger.Debugf("Parsed Vault Certificate: %v", parsedVaultCert)
-		logger.Debugf("Parsed Vault Key: %v", parsedVaultKey)
-		logger.Debugf("Combine Cert and Key: %v", cfg.CombineCertAndKey)
 
 		composedVaultCert := certificate.ComposeCertificate(parsedVaultCert, parsedVaultKey, cfg.CombineCertAndKey)
 
@@ -78,10 +73,10 @@ func main() {
 		if !bytes.Equal(composedVaultCert, fileCert) {
 			logger.Infof("deploying certificate for %s", cert)
 
-			err = deployFile(certificatePath, composedVaultCert)
+			err := os.WriteFile(certificatePath, composedVaultCert, 0600)
 			if err != nil {
 				failedCertificates = append(failedCertificates, cert)
-				logger.Error(err)
+				logger.Errorf("error writing certificate to path %s: %v", certificatePath, err)
 				continue
 			}
 		} else {
@@ -96,7 +91,7 @@ func main() {
 			fileKey, err := loadFile(keyPath)
 			if err != nil {
 				failedCertificates = append(failedCertificates, cert)
-				logger.Error(err)
+				logger.Errorf("error loading key from path %s: %v", keyPath, err)
 				continue
 			}
 
@@ -105,10 +100,10 @@ func main() {
 			if !bytes.Equal(fileKey, composedVaultKey) {
 				logger.Infof("deploying key for %s", cert)
 
-				err = deployFile(keyPath, composedVaultKey)
+				err := os.WriteFile(keyPath, composedVaultKey, 0600)
 				if err != nil {
 					failedCertificates = append(failedCertificates, cert)
-					logger.Error(err)
+					logger.Errorf("error writing key to path %s: %v", keyPath, err)
 					continue
 				}
 			} else {
@@ -134,15 +129,4 @@ func loadFile(path string) ([]byte, error) {
 	}
 
 	return content, nil
-}
-
-func deployFile(path string, content []byte) error {
-
-	err := os.WriteFile(path, content, 0600)
-	if err != nil {
-		return err
-	}
-
-	return nil
-
 }

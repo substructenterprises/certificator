@@ -15,8 +15,8 @@ Certificator reads most configuration parameters from environment variables.
 They are defined in [pkg/config/config.go](pkg/config/config.go) Config struct
 
 Configuration variables:
-- `ACME_ACCOUNT_EMAIL` - email used in certificate retrieval process. Default: "".
-- `ACME_DNS_CHALLENGE_PROVIDER` - DNS challenge provider. Available providers can be found [here](https://go-acme.github.io/lego/dns/#dns-providers). Default: "".
+- `ACME_ACCOUNT_EMAIL` - email used in certificate retrieval process. **Required**
+- `ACME_DNS_CHALLENGE_PROVIDER` - DNS challenge provider. Available providers can be found [here](https://go-acme.github.io/lego/dns/#dns-providers). **Required**
 - `ACME_DNS_PROPAGATION_REQUIREMENT` - if set to true, requires complete DNS record propagation before stating that challenge is solved. Default: true
 - `ACME_REREGISTER_ACCOUNT` - if set to true, allows registering an account with CA. This should be set to true for the first use. When credentials are stored in Vault, you can set this to false to avoid accidental registrations. Default: false
 - `ACME_SERVER_URL` - ACME directory location. Default: https://acme-staging-v02.api.letsencrypt.org/directory
@@ -89,15 +89,15 @@ It relies on several components: pebble, vault, challtestsrv.
 Steps to run it:
 
 1. Build container that runs tests:
-`docker-compose build tester`
+   `docker-compose build tester`
 1. Run tests:
-    - only integration tests:
-    `docker-compose run --rm tester go test ./test/...`
-    - all tests:
-    `docker-compose run --rm tester go test ./...`
+   - only integration tests:
+     `docker-compose run --rm tester go test ./test/...`
+   - all tests:
+     `docker-compose run --rm tester go test ./...`
 1. Check results
 1. Bring down testing infrastructure
-`docker-compose down`
+   `docker-compose down`
 
 #### Unit tests
 
