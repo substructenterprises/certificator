@@ -13,8 +13,8 @@ import (
 
 // Acme contains acme related configuration parameters
 type Acme struct {
-	AccountEmail              string `envconfig:"ACME_ACCOUNT_EMAIL" default:""`
-	DNSChallengeProvider      string `envconfig:"ACME_DNS_CHALLENGE_PROVIDER" default:""`
+	AccountEmail              string `envconfig:"ACME_ACCOUNT_EMAIL" required:"true"`
+	DNSChallengeProvider      string `envconfig:"ACME_DNS_CHALLENGE_PROVIDER" required:"true"`
 	DNSPropagationRequirement bool   `envconfig:"ACME_DNS_PROPAGATION_REQUIREMENT" default:"true"`
 	ReregisterAccount         bool   `envconfig:"ACME_REREGISTER_ACCOUNT" default:"false"`
 	ServerURL                 string `envconfig:"ACME_SERVER_URL" default:"https://acme-staging-v02.api.letsencrypt.org/directory"`
@@ -40,7 +40,6 @@ type Config struct {
 	Acme            Acme
 	Vault           Vault
 	Log             Log
-	Certificatee    Certificatee
 	DNSAddress      string   `envconfig:"DNS_ADDRESS" default:"127.0.0.1:53"`
 	Environment     string   `envconfig:"ENVIRONMENT" default:"prod"`
 	DomainsFile     string   `envconfig:"CERTIFICATOR_DOMAINS_FILE" default:"/code/domains.yml"`
@@ -51,12 +50,16 @@ type Config struct {
 
 // Configuration values specific to the certificatee tool
 type Certificatee struct {
-	CertificatePath      string   `envconfig:"CERTIFICATEE_CERTIFICATE_PATH" default:""`
+	Vault       Vault
+	Log         Log
+	Environment string `envconfig:"ENVIRONMENT" default:"prod"`
+
+	CertificatePath      string   `envconfig:"CERTIFICATEE_CERTIFICATE_PATH" required:"true"`
 	CertificateExtension string   `envconfig:"CERTIFICATEE_CERTIFICATE_EXTENSION" default:".pem"`
-	KeyPath              string   `envconfig:"CERTIFICATEE_KEY_PATH" default:""`
+	KeyPath              string   `envconfig:"CERTIFICATEE_KEY_PATH"`
 	KeyExtension         string   `envconfig:"CERTIFICATEE_KEY_EXTENSION" default:".pem"`
 	CombineCertAndKey    bool     `envconfig:"CERTIFICATEE_COMBINE_CERT_AND_KEY" default:"true"`
-	CertificateNames     []string `envconfig:"CERTIFICATEE_DOMAINS_LIST" default:""`
+	CertificateNames     []string `envconfig:"CERTIFICATEE_DOMAINS_LIST"`
 }
 
 // LoadConfig loads configuration options to  variable
@@ -81,16 +84,15 @@ func LoadConfig() (Config, error) {
 	}
 }
 
-// LoadConfig loads configuration options to  variable
-func LoadCertificateeConfig() (Config, error) {
-	var cfg Config
+func LoadCertificateeConfig() (Certificatee, error) {
+	var cfg Certificatee
 	err := envconfig.Process("", &cfg)
 	if err != nil {
-		return Config{}, fmt.Errorf("failed getting config from env: %w", err)
+		return Certificatee{}, fmt.Errorf("failed getting Certificatee config from env: %w", err)
 	}
 
-	if len(cfg.Certificatee.CertificateNames) == 0 && cfg.Certificatee.CertificatePath != "" {
-		cfg.Certificatee.CertificateNames, err = getCertificateNamesFromFiles(cfg.Certificatee.CertificatePath, cfg.Certificatee.CertificateExtension)
+	if len(cfg.CertificateNames) == 0 {
+		cfg.CertificateNames, err = getCertificateNamesFromFiles(cfg.CertificatePath, cfg.CertificateExtension)
 		if err != nil {
 			return cfg, err
 		}

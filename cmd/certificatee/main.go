@@ -47,11 +47,11 @@ func main() {
 
 	var failedCertificates []string
 
-	logger.Info(cfg.Certificatee.CertificateNames)
+	logger.Info(cfg.CertificateNames)
 
-	for _, cert := range cfg.Certificatee.CertificateNames {
+	for _, cert := range cfg.CertificateNames {
 
-		certificatePath := cfg.Certificatee.CertificatePath + cert + cfg.Certificatee.CertificateExtension
+		certificatePath := cfg.CertificatePath + cert + cfg.CertificateExtension
 
 		fileCert, err := loadFile(certificatePath)
 		if err != nil {
@@ -69,9 +69,9 @@ func main() {
 
 		logger.Debugf("Parsed Vault Certificate: %v", parsedVaultCert)
 		logger.Debugf("Parsed Vault Key: %v", parsedVaultKey)
-		logger.Debugf("Combine Cert and Key: %v", cfg.Certificatee.CombineCertAndKey)
+		logger.Debugf("Combine Cert and Key: %v", cfg.CombineCertAndKey)
 
-		composedVaultCert := certificate.ComposeCertificate(parsedVaultCert, parsedVaultKey, cfg.Certificatee.CombineCertAndKey)
+		composedVaultCert := certificate.ComposeCertificate(parsedVaultCert, parsedVaultKey, cfg.CombineCertAndKey)
 
 		logger.Infof("comparing certificate for %s", cert)
 
@@ -88,10 +88,10 @@ func main() {
 			logger.Infof("certificate for %s matches vault, not replacing", cert)
 		}
 
-		if !cfg.Certificatee.CombineCertAndKey {
+		if !cfg.CombineCertAndKey && cfg.KeyPath != "" {
 			logger.Infof("comparing key for %s", cert)
 
-			keyPath := cfg.Certificatee.KeyPath + cert + cfg.Certificatee.KeyExtension
+			keyPath := cfg.KeyPath + cert + cfg.KeyExtension
 
 			fileKey, err := loadFile(keyPath)
 			if err != nil {

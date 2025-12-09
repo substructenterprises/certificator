@@ -48,11 +48,6 @@ jobs:
         run: go build
         working-directory: cmd/certificatee
 
-      - name: Set up Certificatee test cert files
-        run: |
-          mkdir -p fixtures/certificatee-test-certs
-          touch fixtures/certificatee-test-certs/mydomain.com.pem
-
       - name: Run Certificatee to deploy new certificate
         run: |
           output=$(./cmd/certificatee/certificatee 2>&1)

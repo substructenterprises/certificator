@@ -101,7 +101,6 @@ func NeedsReissuing(certificate *x509.Certificate, domains []string, days int, l
 }
 
 func ComposeCertificate(certs []*x509.Certificate, key crypto.PrivateKey, combined bool) []byte {
-
 	var certificate []byte
 
 	for _, cert := range certs {
@@ -117,10 +116,7 @@ func ComposeCertificate(certs []*x509.Certificate, key crypto.PrivateKey, combin
 }
 
 func ComposeKey(key crypto.PrivateKey) []byte {
-
-	certificate := certcrypto.PEMEncode(key)
-
-	return certificate
+	return certcrypto.PEMEncode(key)
 }
 
 func arraysEqual(array1 []string, array2 []string) bool {

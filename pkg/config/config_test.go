@@ -28,11 +28,6 @@ func TestDefaultConfig(t *testing.T) {
 			Format: "JSON",
 			Level:  "INFO",
 		},
-		Certificatee: Certificatee{
-			CertificateExtension: ".pem",
-			KeyExtension:         ".pem",
-			CombineCertAndKey:    true,
-		},
 		DNSAddress:      "127.0.0.1:53",
 		Environment:     "prod",
 		DomainsFile:     "../../domains.yml",
@@ -77,11 +72,6 @@ func TestConfig_WithDomainsFile(t *testing.T) {
 			Log: Log{
 				Format: logFormat,
 				Level:  logLevel,
-			},
-			Certificatee: Certificatee{
-				CertificateExtension: ".pem",
-				KeyExtension:         ".pem",
-				CombineCertAndKey:    true,
 			},
 			DNSAddress:      dnsAddress,
 			Environment:     environment,
@@ -144,11 +134,6 @@ func TestConfig_WithDomainsList(t *testing.T) {
 				Format: logFormat,
 				Level:  logLevel,
 			},
-			Certificatee: Certificatee{
-				CertificateExtension: ".pem",
-				KeyExtension:         ".pem",
-				CombineCertAndKey:    true,
-			},
 			DNSAddress:      dnsAddress,
 			Environment:     environment,
 			DomainsFile:     "../../domains.yml",
@@ -175,6 +160,63 @@ func TestConfig_WithDomainsList(t *testing.T) {
 	_ = os.Setenv("CERTIFICATOR_DOMAINS_LIST", "mydomain.com,www.mydomain.com,example.com")
 
 	conf, err := LoadConfig()
+	testutil.Ok(t, err)
+	testutil.Equals(t, expectedConf, conf)
+}
+
+func TestLoadCertificateeConfig_Default(t *testing.T) {
+	resetEnvVars()
+
+	var expectedConf = Certificatee{
+		Vault: Vault{
+			ApproleRoleID:   "",
+			ApproleSecretID: "",
+			KVStoragePath:   "secret/data/certificator/",
+		},
+		Log: Log{
+			Format: "JSON",
+			Level:  "INFO",
+		},
+		Environment:          "prod",
+		CertificatePath:      "../../fixtures/certificatee-test-certs",
+		CertificateExtension: ".pem",
+		CertificateNames:     []string{"mydomain.com"},
+		KeyExtension:         ".pem",
+		CombineCertAndKey:    true,
+	}
+
+	_ = os.Setenv("CERTIFICATEE_CERTIFICATE_PATH", "../../fixtures/certificatee-test-certs")
+
+	conf, err := LoadCertificateeConfig()
+	testutil.Ok(t, err)
+	testutil.Equals(t, expectedConf, conf)
+}
+
+func TestLoadCertificateeConfig_WithCertificateNames(t *testing.T) {
+	resetEnvVars()
+
+	var expectedConf = Certificatee{
+		Vault: Vault{
+			ApproleRoleID:   "",
+			ApproleSecretID: "",
+			KVStoragePath:   "secret/data/certificator/",
+		},
+		Log: Log{
+			Format: "JSON",
+			Level:  "INFO",
+		},
+		Environment:          "prod",
+		CertificatePath:      "../../fixtures/certificatee-test-certs",
+		CertificateExtension: ".pem",
+		CertificateNames:     []string{"anotherdomain.com"},
+		KeyExtension:         ".pem",
+		CombineCertAndKey:    true,
+	}
+
+	_ = os.Setenv("CERTIFICATEE_CERTIFICATE_PATH", "../../fixtures/certificatee-test-certs")
+	_ = os.Setenv("CERTIFICATEE_DOMAINS_LIST", "anotherdomain.com")
+
+	conf, err := LoadCertificateeConfig()
 	testutil.Ok(t, err)
 	testutil.Equals(t, expectedConf, conf)
 }
